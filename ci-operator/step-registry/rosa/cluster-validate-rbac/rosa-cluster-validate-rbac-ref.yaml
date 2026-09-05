@@ -7,7 +7,7 @@ ref:
     requests:
       cpu: 100m
       memory: 300Mi
-  timeout: 5m0s
+  timeout: 7m0s
   documentation: |-
     Validates RBAC health on a leased ROSA cluster before running e2e tests.
 

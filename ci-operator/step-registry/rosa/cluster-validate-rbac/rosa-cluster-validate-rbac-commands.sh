@@ -70,6 +70,25 @@ while true; do
     # All checks passed
     if [[ -z "${MISSING}" ]]; then
         echo ""
+        echo "All RBAC resources present. Running functional authorization check..."
+
+        # Verify the ClusterRoleBinding actually grants permissions (cluster-scoped check)
+        if ! oc auth can-i create configmaps \
+            --as="probe@redhat.com" --as-group="dedicated-admins" \
+            --request-timeout=30s 2>/dev/null; then
+            echo "ERROR: dedicated-admins ClusterRoleBinding exists but authorization check failed"
+            echo ""
+            echo "=== Authorization Diagnostics ==="
+            echo "ClusterRoleBinding details:"
+            oc get clusterrolebinding dedicated-admins-cluster -o yaml --request-timeout=30s 2>/dev/null || echo "  Unable to describe CRB"
+            echo ""
+            echo "ClusterRole details:"
+            oc get clusterrole dedicated-admins-cluster -o yaml --request-timeout=30s 2>/dev/null || echo "  Unable to describe ClusterRole"
+            exit 1
+        fi
+        echo "RBAC authorization check passed"
+
+        echo ""
         echo "RBAC validation passed - all resources are present and operator is running"
         exit 0
     fi
