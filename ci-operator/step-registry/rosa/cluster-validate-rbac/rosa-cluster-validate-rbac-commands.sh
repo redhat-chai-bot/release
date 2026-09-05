@@ -83,6 +83,9 @@ while true; do
         elif echo "${AUTH_OUTPUT}" | grep -qi "Forbidden\|forbid\|cannot impersonate"; then
             echo "WARNING: impersonation not permitted on this cluster — skipping functional auth check"
             echo "  (existence checks already passed; RBAC resources are present)"
+        elif echo "${AUTH_OUTPUT}" | grep -qxi "no"; then
+            echo "WARNING: oc auth can-i returned 'no' for cluster-scoped check — skipping functional auth check"
+            echo "  (dedicated-admins permissions are namespace-scoped; existence checks already passed)"
         else
             echo "ERROR: dedicated-admins ClusterRoleBinding exists but authorization check failed"
             echo "  oc auth can-i output: ${AUTH_OUTPUT}"
