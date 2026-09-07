@@ -216,7 +216,6 @@ deck:
       '*': https://gcs.ci.openshift.org/gcs/
       openshift-eng/agent-qe-infra: https://gcsweb-qe-private-deck-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/
       openshift-eng/olm-team-ai-helpers: https://gcsweb-qe-private-deck-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/
-      openshift-eng/ship-help-bot: https://gcsweb-qe-private-deck-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/
       openshift-hyperfleet/hyperfleet-adapter: https://gcsweb-qe-private-deck-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/
       openshift-hyperfleet/hyperfleet-api: https://gcsweb-qe-private-deck-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/
       openshift-hyperfleet/hyperfleet-broker: https://gcsweb-qe-private-deck-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/
