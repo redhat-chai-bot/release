@@ -32,7 +32,7 @@ prowgen:
 resources:
   '*':
     limits:
-      cpu: "3"
+      cpu: "8"
       memory: 6Gi
     requests:
       cpu: "3"
