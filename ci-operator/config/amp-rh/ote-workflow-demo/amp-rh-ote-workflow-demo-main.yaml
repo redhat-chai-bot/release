@@ -1,0 +1,69 @@
+# OTE (OpenShift Tests Extension) Workflow Demo
+#
+# This ci-operator config demonstrates the proposed OTE workflow pattern:
+#
+#   1. build_root — uses the RHEL9 + Go 1.22 builder from the ocp namespace,
+#      which produces the `src` pipeline image (repo source + toolchain).
+#
+#   2. images — builds the test binary from source using a dockerfile_literal
+#      that runs `make build` on top of the `src` image, tagging the result
+#      as `interop-tests`.
+#
+#   3. tests — three test types:
+#      a) unit + lint — lightweight checks running in the `src` container
+#         directly on the build farm (no cluster required).
+#      b) e2e — provisions an AWS cluster via ipi-aws, then runs the built
+#         binary from the `interop-tests` image against that cluster.
+#
+# This is a demo config — not intended for merge.
+
+# Top-level keys are in alphabetical order (build_root, images, tests).
+
+build_root:
+  image_stream_tag:
+    name: builder
+    namespace: ocp
+    tag: rhel-9-release-golang-1.22-openshift-4.18
+
+images:
+# Build the test binary from source.
+# The dockerfile_literal starts FROM the `src` pipeline image (which contains
+# the repo checkout + Go toolchain) and runs `make build` to compile the
+# interop test binary.  The resulting image is tagged `interop-tests` and
+# referenced by the e2e test step below.
+- dockerfile_literal: |
+    FROM src
+    RUN make build
+  from: src
+  to: interop-tests
+
+tests:
+# --- Build-farm tests (no cluster needed) ---
+- as: lint
+  commands: make lint
+  container:
+    from: src
+- as: unit
+  commands: make test
+  container:
+    from: src
+
+# --- e2e test (provisions an AWS cluster via ipi-aws) ---
+# Uses the `interop-tests` image built in the images stanza.
+# The test step sets EXTENSION_ARTIFACTS_DIR so OTE writes results
+# to the ci-operator artifact directory for Prow to collect.
+- as: e2e
+  steps:
+    cluster_profile: aws
+    test:
+    - as: run-tests
+      cli: latest
+      commands: |
+        export EXTENSION_ARTIFACTS_DIR="${ARTIFACT_DIR}"
+        make ote-test
+      from: interop-tests
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+    workflow: ipi-aws
