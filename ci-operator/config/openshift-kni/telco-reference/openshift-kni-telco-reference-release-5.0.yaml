@@ -6,6 +6,7 @@ build_root:
       RUN dnf -y install git go python3 python3-pip diffutils jq && \
           printf '%s\n' \
             'pathspec==1.1.1 --hash=sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189' \
+            'PyYAML==6.0.2 --hash=sha256:3ad2a3decf9aaba3d29c8f537ac4b243e36bef957511b4766cb0057d32b0be85' \
             'yamllint==1.38.0 --hash=sha256:fc394a5b3be980a4062607b8fdddc0843f4fa394152b6da21722f5d59013c220' \
           | python3 -m pip install --require-hashes --no-deps -r /dev/stdin
       RUN curl -L -o /tmp/kube-compare.tar.gz https://github.com/openshift/kube-compare/releases/download/v0.12.0/kube-compare_linux_amd64.tar.gz && \
