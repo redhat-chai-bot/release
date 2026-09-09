@@ -1,0 +1,89 @@
+build_root:
+  from_repository: true
+images:
+  items:
+  - dockerfile_literal: |
+      FROM src
+      RUN go build -o /usr/bin/openshift-apiserver-tests-ext ./cmd/openshift-apiserver-tests-ext
+    from: src
+    to: openshift-apiserver-tests-ext
+releases:
+  initial:
+    integration:
+      name: "5.1"
+      namespace: ocp
+  latest:
+    integration:
+      include_built_images: true
+      name: "5.1"
+      namespace: ocp
+resources:
+  '*':
+    requests:
+      cpu: 200m
+      memory: 400Mi
+tests:
+- as: e2e-ote
+  steps:
+    cluster_profile: aws
+    test:
+    - as: run-tests
+      cli: latest
+      commands: |
+        export EXTENSION_ARTIFACTS_DIR="${ARTIFACT_DIR}"
+        echo "=== OTE Binary Verification ==="
+        openshift-apiserver-tests-ext --version
+        echo ""
+        echo "=== OTE Extension Metadata ==="
+        openshift-apiserver-tests-ext info --component openshift:payload:openshift-apiserver 2>&1 || echo "(info command not available)"
+        echo ""
+        echo "=== OTE workflow demo complete ==="
+        echo "The binary runs on the ipi-aws provisioned cluster."
+        echo "When real test suites are registered via AddSuite(),"
+        echo "they would be invoked with: openshift-apiserver-tests-ext run-suite <suite-name>"
+      from: openshift-apiserver-tests-ext
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+    workflow: ipi-aws
+- as: e2e-ote-env-override
+  steps:
+    cluster_profile: aws
+    env:
+      COMPUTE_NODE_REPLICAS: "3"
+      COMPUTE_NODE_TYPE: m6i.xlarge
+    test:
+    - as: run-tests
+      cli: latest
+      commands: |
+        export EXTENSION_ARTIFACTS_DIR="${ARTIFACT_DIR}"
+        echo "=== OTE Binary Verification ==="
+        openshift-apiserver-tests-ext --version
+        echo ""
+        echo "=== OTE Extension Metadata ==="
+        openshift-apiserver-tests-ext info --component openshift:payload:openshift-apiserver 2>&1 || echo "(info command not available)"
+        echo ""
+        echo "=== OTE workflow demo complete ==="
+        echo "The binary runs on the ipi-aws provisioned cluster."
+        echo "When real test suites are registered via AddSuite(),"
+        echo "they would be invoked with: openshift-apiserver-tests-ext run-suite <suite-name>"
+      from: openshift-apiserver-tests-ext
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+    workflow: ipi-aws
+- as: lint
+  commands: make verify -k --warn-undefined-variables
+  container:
+    from: src
+- as: unit
+  commands: make test-unit --warn-undefined-variables
+  container:
+    from: src
+zz_generated_metadata:
+  branch: main
+  org: openshift
+  repo: openshift-apiserver
+  variant: ote-demo
