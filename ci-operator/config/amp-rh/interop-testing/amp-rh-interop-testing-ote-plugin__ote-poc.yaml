@@ -1,0 +1,30 @@
+build_root:
+  image_stream_tag:
+    name: release
+    namespace: openshift
+    tag: rhel-9-release-golang-1.22-openshift-4.18
+images:
+  items:
+  - dockerfile_path: image/container/ote-plugin/Dockerfile
+    to: ote-plugin
+resources:
+  '*':
+    requests:
+      cpu: 200m
+      memory: 400Mi
+tests:
+- as: unit
+  commands: make test
+  container:
+    from: src
+- as: ote-verify
+  commands: |
+    ote-plugin info
+    ote-plugin list
+  container:
+    from: ote-plugin
+zz_generated_metadata:
+  branch: ote-plugin
+  org: amp-rh
+  repo: interop-testing
+  variant: ote-poc

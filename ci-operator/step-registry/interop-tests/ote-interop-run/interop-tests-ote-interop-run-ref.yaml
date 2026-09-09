@@ -1,0 +1,19 @@
+ref:
+  as: interop-tests-ote-interop-run
+  from: ote-plugin
+  commands: interop-tests-ote-interop-run-commands.sh
+  documentation: |-
+    Run the OTE interop plugin against a provisioned cluster. The plugin executes
+    interop test suites for layered products (OPP, CNV, ACM) via the OpenShift Tests
+    Extension framework. Products without configured test commands are skipped (exit 66).
+  timeout: 2h0m0s
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+  env:
+  - name: OTE_INTEROP_SUITE
+    default: "interop/all"
+    documentation: |-
+      The OTE suite to run. Available suites: interop/all (all products),
+      interop/opp, interop/cnv, interop/acm (individual products).

@@ -1,0 +1,11 @@
+{
+	"path": "interop-tests/ote-interop-run/interop-tests-ote-interop-run-ref.yaml",
+	"owners": {
+		"approvers": [
+			"amp-rh"
+		],
+		"reviewers": [
+			"amp-rh"
+		]
+	}
+}
