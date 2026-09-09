@@ -25,7 +25,7 @@ resources:
       cpu: 100m
       memory: 200Mi
 zz_generated_metadata:
-  branch: release-ocm-5.0
+  branch: backplane-5.0
   org: openshift-priv
   repo: assisted-installer
   variant: mce

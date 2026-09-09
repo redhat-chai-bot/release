@@ -5,9 +5,9 @@ presubmits:
     annotations:
       pipeline_run_if_changed: ^(hack/.*|pkg/.*|src/.*|scripts/.*|vendor/.*|Dockerfile\..*|Makefile|go\.mod|go\.sum|\.dockerignore)$
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp
     decorate: true
     decoration_config:
@@ -26,7 +26,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-installer-agent-release-ocm-5.0-e2e-ai-operator-ztp
+    name: pull-ci-openshift-priv-assisted-installer-agent-backplane-5.0-e2e-ai-operator-ztp
     optional: true
     path_alias: github.com/openshift/assisted-installer-agent
     rerun_command: /test e2e-ai-operator-ztp
@@ -102,9 +102,9 @@ presubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build03
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/images
     decorate: true
     decoration_config:
@@ -120,7 +120,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-installer-agent-release-ocm-5.0-images
+    name: pull-ci-openshift-priv-assisted-installer-agent-backplane-5.0-images
     path_alias: github.com/openshift/assisted-installer-agent
     rerun_command: /test images
     spec:
@@ -170,9 +170,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build03
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/lint
     decorate: true
     decoration_config:
@@ -188,7 +188,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-installer-agent-release-ocm-5.0-lint
+    name: pull-ci-openshift-priv-assisted-installer-agent-backplane-5.0-lint
     path_alias: github.com/openshift/assisted-installer-agent
     rerun_command: /test lint
     skip_if_only_changed: ^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|LICENSE)$
@@ -247,9 +247,9 @@ presubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build03
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/mce-images
     decorate: true
     decoration_config:
@@ -264,7 +264,7 @@ presubmits:
       ci-operator.openshift.io/variant: mce
       ci.openshift.io/generator: prowgen
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-installer-agent-release-ocm-5.0-mce-images
+    name: pull-ci-openshift-priv-assisted-installer-agent-backplane-5.0-mce-images
     path_alias: github.com/openshift/assisted-installer-agent
     rerun_command: /test mce-images
     spec:
@@ -317,9 +317,9 @@ presubmits:
     annotations:
       pipeline_skip_if_only_changed: ^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|LICENSE)$
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/subsystem-test
     decorate: true
     decoration_config:
@@ -338,7 +338,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-installer-agent-release-ocm-5.0-subsystem-test
+    name: pull-ci-openshift-priv-assisted-installer-agent-backplane-5.0-subsystem-test
     path_alias: github.com/openshift/assisted-installer-agent
     rerun_command: /test subsystem-test
     spec:
@@ -413,9 +413,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build03
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/unit-test
     decorate: true
     decoration_config:
@@ -431,7 +431,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-installer-agent-release-ocm-5.0-unit-test
+    name: pull-ci-openshift-priv-assisted-installer-agent-backplane-5.0-unit-test
     path_alias: github.com/openshift/assisted-installer-agent
     rerun_command: /test unit-test
     skip_if_only_changed: ^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|LICENSE)$

@@ -3,9 +3,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/assisted-operator-catalog-publish-verify
     decorate: true
     decoration_config:
@@ -27,7 +27,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-assisted-operator-catalog-publish-verify
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-assisted-operator-catalog-publish-verify
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test assisted-operator-catalog-publish-verify
     run_if_changed: ^(deploy/olm-catalog/.*)$
@@ -103,9 +103,9 @@ presubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/ci-index
     decorate: true
     decoration_config:
@@ -127,7 +127,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-ci-index
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-ci-index
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test ci-index
     spec:
@@ -177,9 +177,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-disconnected-capi
     decorate: true
     decoration_config:
@@ -204,7 +204,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-disconnected-capi
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-disconnected-capi
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-disconnected-capi
@@ -281,9 +281,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp
     decorate: true
     decoration_config:
@@ -308,7 +308,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp
@@ -385,9 +385,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-3masters
     decorate: true
     decoration_config:
@@ -412,7 +412,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-3masters
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-3masters
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-3masters
     spec:
@@ -487,9 +487,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-capi
     decorate: true
     decoration_config:
@@ -514,7 +514,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-capi
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-capi
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-capi
     run_if_changed: ^(deploy/operator/.*|api/.*|internal/controller/controllers/.*)$
@@ -590,9 +590,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-compact-day2-masters
     decorate: true
     decoration_config:
@@ -617,7 +617,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-compact-day2-masters
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-compact-day2-masters
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-compact-day2-masters
@@ -693,9 +693,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-compact-day2-workers
     decorate: true
     decoration_config:
@@ -720,7 +720,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-compact-day2-workers
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-compact-day2-workers
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-compact-day2-workers
@@ -796,9 +796,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-disconnected
     decorate: true
     decoration_config:
@@ -823,7 +823,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-disconnected
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-disconnected
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-disconnected
     run_if_changed: ^(deploy/operator/.*)$
@@ -899,9 +899,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-multiarch-3masters-ocp
     decorate: true
     decoration_config:
@@ -926,7 +926,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-multiarch-3masters-ocp
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-multiarch-3masters-ocp
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-multiarch-3masters-ocp
@@ -1002,9 +1002,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-multiarch-sno-ocp
     decorate: true
     decoration_config:
@@ -1029,7 +1029,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-multiarch-sno-ocp
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-multiarch-sno-ocp
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-multiarch-sno-ocp
@@ -1105,9 +1105,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-node-labels
     decorate: true
     decoration_config:
@@ -1132,7 +1132,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-node-labels
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-node-labels
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-node-labels
@@ -1208,9 +1208,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-sno-day2-masters
     decorate: true
     decoration_config:
@@ -1235,7 +1235,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-sno-day2-masters
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-sno-day2-masters
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-sno-day2-masters
@@ -1311,9 +1311,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-sno-day2-workers
     decorate: true
     decoration_config:
@@ -1338,7 +1338,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-sno-day2-workers
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-sno-day2-workers
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-sno-day2-workers
@@ -1414,9 +1414,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-sno-day2-workers-ignitionoverride
     decorate: true
     decoration_config:
@@ -1441,7 +1441,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-sno-day2-workers-ignitionoverride
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-sno-day2-workers-ignitionoverride
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-sno-day2-workers-ignitionoverride
@@ -1517,9 +1517,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build10
     context: ci/prow/e2e-ai-operator-ztp-sno-day2-workers-late-binding
     decorate: true
     decoration_config:
@@ -1544,7 +1544,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-e2e-ai-operator-ztp-sno-day2-workers-late-binding
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-e2e-ai-operator-ztp-sno-day2-workers-late-binding
     optional: true
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test e2e-ai-operator-ztp-sno-day2-workers-late-binding
@@ -1620,9 +1620,9 @@ presubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/images
     decorate: true
     decoration_config:
@@ -1644,7 +1644,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-images
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-images
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test images
     spec:
@@ -1694,9 +1694,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/lint
     decorate: true
     decoration_config:
@@ -1718,7 +1718,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-lint
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-lint
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test lint
     skip_if_only_changed: ^dashboards/|^\.tekton/|^openshift/|^docs/|^sites/|\.md$|^(LICENSE|OWNERS|OWNERS_ALIASES)$
@@ -1777,9 +1777,9 @@ presubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/mce-images
     decorate: true
     decoration_config:
@@ -1793,7 +1793,7 @@ presubmits:
       ci-operator.openshift.io/variant: mce
       ci.openshift.io/generator: prowgen
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-mce-images
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-mce-images
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test mce-images
     spec:
@@ -1844,9 +1844,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/subsystem-aws
     decorate: true
     decoration_config:
@@ -1868,7 +1868,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-subsystem-aws
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-subsystem-aws
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test subsystem-aws
     run_if_changed: ^(cmd/.*|deploy/.*|hack/.*|internal/.*|pkg/.*|tools/.*|subsystem/.*|Dockerfile\..*|Makefile|go\.mod|go\.sum|swagger.yaml)$
@@ -1951,9 +1951,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/subsystem-kubeapi-aws
     decorate: true
     decoration_config:
@@ -1975,7 +1975,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-subsystem-kubeapi-aws
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-subsystem-kubeapi-aws
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test subsystem-kubeapi-aws
     run_if_changed: ^(cmd/.*|deploy/.*|hack/.*|internal/.*|pkg/.*|tools/.*|subsystem/.*|Dockerfile\..*|Makefile|go\.mod|go\.sum|swagger.yaml)$
@@ -2058,9 +2058,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/unit-test
     decorate: true
     decoration_config:
@@ -2082,7 +2082,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-unit-test
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-unit-test
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test unit-test
     skip_if_only_changed: ^dashboards/|^\.tekton/|^openshift/|^docs/|^sites/|\.md$|^(LICENSE|OWNERS|OWNERS_ALIASES)$
@@ -2148,9 +2148,9 @@ presubmits:
   - agent: kubernetes
     always_run: false
     branches:
-    - ^release-ocm-5\.0$
-    - ^release-ocm-5\.0-
-    cluster: build12
+    - ^backplane-5\.0$
+    - ^backplane-5\.0-
+    cluster: build01
     context: ci/prow/verify-generated-code
     decorate: true
     decoration_config:
@@ -2172,7 +2172,7 @@ presubmits:
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
       pj-rehearse.openshift.io/can-be-rehearsed: "true"
-    name: pull-ci-openshift-priv-assisted-service-release-ocm-5.0-verify-generated-code
+    name: pull-ci-openshift-priv-assisted-service-backplane-5.0-verify-generated-code
     path_alias: github.com/openshift/assisted-service
     rerun_command: /test verify-generated-code
     skip_if_only_changed: ^dashboards/|^\.tekton/|^openshift/|^docs/|^sites/|\.md$|^(LICENSE|OWNERS|OWNERS_ALIASES)$

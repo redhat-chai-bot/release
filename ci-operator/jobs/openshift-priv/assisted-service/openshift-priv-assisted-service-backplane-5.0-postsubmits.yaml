@@ -1,9 +1,9 @@
 postsubmits:
-  openshift-priv/assisted-image-service:
+  openshift-priv/assisted-service:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
+    - ^backplane-5\.0$
     cluster: build01
     decorate: true
     decoration_config:
@@ -12,16 +12,22 @@ postsubmits:
         name: github-credentials-openshift-ci-robot-private-git-cloner
       sparse_checkout_files:
       - .ci-operator.yaml
-      - Dockerfile.image-service
-      - Dockerfile.image-service-build
+      - Dockerfile.assisted-service
+      - Dockerfile.assisted-service-build
+      - Dockerfile.assisted-service-debug
+      - ci-images/Dockerfile.base
+      - ci-images/Dockerfile.code-generation
+      - ci-images/Dockerfile.lint
+      - ci-images/Dockerfile.subsystem
+      - ci-images/Dockerfile.unit-tests
     hidden: true
     labels:
       ci-operator.openshift.io/is-promotion: "true"
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
     max_concurrency: 1
-    name: branch-ci-openshift-priv-assisted-image-service-release-ocm-5.0-images
-    path_alias: github.com/openshift/assisted-image-service
+    name: branch-ci-openshift-priv-assisted-service-backplane-5.0-images
+    path_alias: github.com/openshift/assisted-service
     spec:
       containers:
       - args:
@@ -76,7 +82,7 @@ postsubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
+    - ^backplane-5\.0$
     cluster: build01
     decorate: true
     decoration_config:
@@ -84,16 +90,15 @@ postsubmits:
         key: oauth
         name: github-credentials-openshift-ci-robot-private-git-cloner
       sparse_checkout_files:
-      - .ci-operator.yaml
-      - Dockerfile.image-service
+      - Dockerfile.assisted-service
     hidden: true
     labels:
       ci-operator.openshift.io/is-promotion: "true"
       ci-operator.openshift.io/variant: mce
       ci.openshift.io/generator: prowgen
     max_concurrency: 1
-    name: branch-ci-openshift-priv-assisted-image-service-release-ocm-5.0-mce-images
-    path_alias: github.com/openshift/assisted-image-service
+    name: branch-ci-openshift-priv-assisted-service-backplane-5.0-mce-images
+    path_alias: github.com/openshift/assisted-service
     spec:
       containers:
       - args:
