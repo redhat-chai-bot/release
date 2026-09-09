@@ -350,19 +350,26 @@ _VERIFY_DEPLOYED=$(_safe_digest "${DEPLOYED_IMAGE}")
 _VERIFY_POD=$(_safe_digest "${POD_IMAGE_ID}")
 
 # When an explicit override was supplied, verify the deployment converged to the
-# intended image by comparing immutable sha256 digests. A mismatch means the
-# operator rollout did not pick up the override — fail the step so the CI signal
-# is clear. This only fires on the opt-in override path; ordinary e2e jobs that
-# use the default pipeline image are unaffected.
-if [[ "${_VERIFY_OVERRIDE}" == "true" ]] && [[ "${POD_IMAGE_ID}" != "unavailable" ]]; then
-  # Extract sha256 digest from the pod's imageID.
-  # Handles both "docker-pullable://…@sha256:abc" and "docker://sha256:abc".
-  DEPLOYED_DIGEST=$(_extract_digest "${POD_IMAGE_ID}")
+# intended image. Digest-pinned overrides (image@sha256:…) require a matching
+# deployed digest — exit non-zero when the deployed digest cannot be resolved or
+# does not match. Tag-only overrides have no immutable digest to compare, so
+# verification is explicitly skipped with an informational message. Ordinary e2e
+# jobs that use the default pipeline image are unaffected.
+if [[ "${_VERIFY_OVERRIDE}" == "true" ]]; then
   # Extract sha256 digest from the intended override image if it contains one.
   INTENDED_DIGEST=$(_extract_digest "${OVERRIDE_HYPERSHIFT_OPERATOR_IMAGE}")
 
-  if [[ "${INTENDED_DIGEST}" == sha256:* ]] && [[ "${DEPLOYED_DIGEST}" == sha256:* ]]; then
-    if [[ "${INTENDED_DIGEST}" != "${DEPLOYED_DIGEST}" ]]; then
+  if [[ "${INTENDED_DIGEST}" == sha256:* ]]; then
+    # Override is digest-pinned — deployed digest must be resolvable and matching.
+    DEPLOYED_DIGEST=$(_extract_digest "${POD_IMAGE_ID}")
+    if [[ "${DEPLOYED_DIGEST}" != sha256:* ]]; then
+      echo "ERROR: HyperShift Operator image digest could not be verified"
+      echo "  Intended digest: ${INTENDED_DIGEST}"
+      echo "  Pod digest: $(_safe_digest "${POD_IMAGE_ID}")"
+      # Restore xtrace before exiting so post-step cleanup is visible.
+      ${_XTRACE_WAS_ON} && set -x || true
+      exit 1
+    elif [[ "${INTENDED_DIGEST}" != "${DEPLOYED_DIGEST}" ]]; then
       echo "ERROR: HyperShift Operator image digest mismatch"
       echo "  Intended digest: ${INTENDED_DIGEST}"
       echo "  Deployed digest: ${DEPLOYED_DIGEST}"
@@ -373,6 +380,9 @@ if [[ "${_VERIFY_OVERRIDE}" == "true" ]] && [[ "${POD_IMAGE_ID}" != "unavailable
       echo "INFO: HyperShift Operator image digest verified"
       echo "  Digest: ${DEPLOYED_DIGEST}"
     fi
+  else
+    # Override is tag-only — no immutable digest to compare.
+    echo "INFO: digest verification skipped (tag-only override, no immutable digest to compare)"
   fi
 fi
 
