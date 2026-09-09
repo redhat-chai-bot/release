@@ -1,10 +1,9 @@
 postsubmits:
-  openshift-priv/assisted-service:
+  openshift-priv/assisted-installer-agent:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    cluster: build01
+    - ^backplane-5\.0$
     decorate: true
     decoration_config:
       oauth_token_secret:
@@ -12,22 +11,16 @@ postsubmits:
         name: github-credentials-openshift-ci-robot-private-git-cloner
       sparse_checkout_files:
       - .ci-operator.yaml
-      - Dockerfile.assisted-service
-      - Dockerfile.assisted-service-build
-      - Dockerfile.assisted-service-debug
-      - ci-images/Dockerfile.base
-      - ci-images/Dockerfile.code-generation
-      - ci-images/Dockerfile.lint
-      - ci-images/Dockerfile.subsystem
-      - ci-images/Dockerfile.unit-tests
+      - Dockerfile.assisted_installer_agent
+      - Dockerfile.assisted_installer_agent-build
     hidden: true
     labels:
       ci-operator.openshift.io/is-promotion: "true"
       ci.openshift.io/generator: prowgen
       job-release: "5.0"
     max_concurrency: 1
-    name: branch-ci-openshift-priv-assisted-service-release-ocm-5.0-images
-    path_alias: github.com/openshift/assisted-service
+    name: branch-ci-openshift-priv-assisted-installer-agent-backplane-5.0-images
+    path_alias: github.com/openshift/assisted-installer-agent
     spec:
       containers:
       - args:
@@ -82,23 +75,23 @@ postsubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    cluster: build01
+    - ^backplane-5\.0$
     decorate: true
     decoration_config:
       oauth_token_secret:
         key: oauth
         name: github-credentials-openshift-ci-robot-private-git-cloner
       sparse_checkout_files:
-      - Dockerfile.assisted-service
+      - .ci-operator.yaml
+      - Dockerfile.assisted_installer_agent
     hidden: true
     labels:
       ci-operator.openshift.io/is-promotion: "true"
       ci-operator.openshift.io/variant: mce
       ci.openshift.io/generator: prowgen
     max_concurrency: 1
-    name: branch-ci-openshift-priv-assisted-service-release-ocm-5.0-mce-images
-    path_alias: github.com/openshift/assisted-service
+    name: branch-ci-openshift-priv-assisted-installer-agent-backplane-5.0-mce-images
+    path_alias: github.com/openshift/assisted-installer-agent
     spec:
       containers:
       - args:

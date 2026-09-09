@@ -1,10 +1,9 @@
 postsubmits:
-  openshift-priv/cluster-api-provider-agent:
+  openshift-priv/assisted-installer:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    cluster: build01
+    - ^backplane-5\.0$
     decorate: true
     decoration_config:
       oauth_token_secret:
@@ -12,14 +11,17 @@ postsubmits:
         name: github-credentials-openshift-ci-robot-private-git-cloner
       sparse_checkout_files:
       - .ci-operator.yaml
-      - Dockerfile
+      - Dockerfile.assisted-installer
+      - Dockerfile.assisted-installer-build
+      - Dockerfile.assisted-installer-controller
     hidden: true
     labels:
       ci-operator.openshift.io/is-promotion: "true"
       ci.openshift.io/generator: prowgen
+      job-release: "5.0"
     max_concurrency: 1
-    name: branch-ci-openshift-priv-cluster-api-provider-agent-release-ocm-5.0-images
-    path_alias: github.com/openshift/cluster-api-provider-agent
+    name: branch-ci-openshift-priv-assisted-installer-backplane-5.0-images
+    path_alias: github.com/openshift/assisted-installer
     spec:
       containers:
       - args:
@@ -74,8 +76,7 @@ postsubmits:
   - agent: kubernetes
     always_run: true
     branches:
-    - ^release-ocm-5\.0$
-    cluster: build01
+    - ^backplane-5\.0$
     decorate: true
     decoration_config:
       oauth_token_secret:
@@ -83,15 +84,16 @@ postsubmits:
         name: github-credentials-openshift-ci-robot-private-git-cloner
       sparse_checkout_files:
       - .ci-operator.yaml
-      - Dockerfile
+      - Dockerfile.assisted-installer
+      - Dockerfile.assisted-installer-controller
     hidden: true
     labels:
       ci-operator.openshift.io/is-promotion: "true"
       ci-operator.openshift.io/variant: mce
       ci.openshift.io/generator: prowgen
     max_concurrency: 1
-    name: branch-ci-openshift-priv-cluster-api-provider-agent-release-ocm-5.0-mce-images
-    path_alias: github.com/openshift/cluster-api-provider-agent
+    name: branch-ci-openshift-priv-assisted-installer-backplane-5.0-mce-images
+    path_alias: github.com/openshift/assisted-installer
     spec:
       containers:
       - args:
