@@ -61,6 +61,75 @@ elif [[ "${INSTALL_FROM_LATEST}" == "true" ]]; then
   extract_hcp_cli "${OPERATOR_IMAGE}"
 fi
 
+# --- Helper functions for operator-image verification ---
+# Defined before the install command so the operator-image artifact can be
+# written early enough to survive an install failure under set -e.
+
+# Extract a sha256 digest from an image reference or runtime imageID.
+# Handles pullspec digests ("…@sha256:abc"), CRI-O runtime imageIDs
+# ("docker://sha256:abc"), and returns "tag-only" or "unavailable" otherwise.
+# Never emits a raw pullspec.
+_safe_digest() {
+  local ref="$1"
+  if [[ "${ref}" == *@sha256:* ]]; then
+    echo "${ref##*@}"
+  elif [[ "${ref}" == docker://sha256:* ]]; then
+    echo "${ref#docker://}"
+  elif [[ "${ref}" == "unavailable" ]]; then
+    echo "unavailable"
+  else
+    echo "tag-only"
+  fi
+}
+
+# Extract a sha256 digest from a raw image reference for comparison.
+_extract_digest() {
+  local ref="$1"
+  if [[ "${ref}" == *@sha256:* ]]; then
+    echo "${ref##*@}"
+  elif [[ "${ref}" == docker://sha256:* ]]; then
+    echo "${ref#docker://}"
+  else
+    echo "${ref}"
+  fi
+}
+
+# --- Record operator-image artifacts before the install command ---
+# Writing here ensures the artifacts survive a set -e exit during install.
+# SHARED_DIR is for downstream steps; ARTIFACT_DIR is the public Prow artifact.
+echo "${OPERATOR_IMAGE}" > "${SHARED_DIR}/hypershift-operator-image"
+# Suppress xtrace around _safe_digest so raw pullspec arguments are not logged.
+{ set +x; } 2>/dev/null
+_safe_digest "${OPERATOR_IMAGE}" > "${ARTIFACT_DIR}/hypershift-operator-image.txt"
+
+# --- Verification artifact state (defaults for the EXIT trap) ---
+_VERIFY_INTENDED=$(_safe_digest "${OPERATOR_IMAGE}")
+_VERIFY_DEPLOYED="unavailable"
+_VERIFY_POD="unavailable"
+_VERIFY_OVERRIDE="false"
+[[ -n "${OVERRIDE_HYPERSHIFT_OPERATOR_IMAGE:-}" ]] && _VERIFY_OVERRIDE="true"
+set -x
+
+# EXIT trap: always emit the structured verification JSON, even on failure.
+_write_verification_artifact() {
+  { set +ex; } 2>/dev/null   # run to completion, suppress trace
+  if [[ -n "${ARTIFACT_DIR:-}" ]]; then
+    cat > "${ARTIFACT_DIR}/hypershift-operator-image-verification.json" <<TRAP_EOF
+{
+  "intended_digest": "${_VERIFY_INTENDED}",
+  "deployed_digest": "${_VERIFY_DEPLOYED}",
+  "pod_digest": "${_VERIFY_POD}",
+  "override_supplied": ${_VERIFY_OVERRIDE}
+}
+TRAP_EOF
+    echo "INFO: HyperShift Operator image verification artifact written"
+    echo "  Intended: ${_VERIFY_INTENDED}"
+    echo "  Deployed: ${_VERIFY_DEPLOYED}"
+    echo "  Pod: ${_VERIFY_POD}"
+  fi
+}
+trap _write_verification_artifact EXIT
+
 INSTALL_HELP=$("${HCP_CLI}" install --help 2>&1 || true)
 
 if [ "${TECH_PREVIEW_NO_UPGRADE}" = "true" ]; then
@@ -193,18 +262,37 @@ case "${CLOUD_PROVIDER}" in
   HYPERSHIFT_CI_PROJECT="$(<"${SHARED_DIR}/hypershift-ci-project")"
   HYPERSHIFT_CI_DNS_DOMAIN="$(<"${SHARED_DIR}/hypershift-ci-dns-domain")"
 
+  # Shared install flags, reused for both the feature-detection render below
+  # and the real install so they can never drift apart.
+  CMD_ARGS=(
+    --hypershift-image="${OPERATOR_IMAGE}"
+    --external-dns-provider=google
+    --external-dns-domain-filter="${HYPERSHIFT_CI_DNS_DOMAIN}"
+    --external-dns-google-project="${HYPERSHIFT_CI_PROJECT}"
+    --private-platform=GCP
+    --gcp-project="${GCP_PROJECT_ID}"
+    --gcp-region="${GCP_REGION_VALUE}"
+    --platform-monitoring=All
+    --enable-ci-debug-output
+    --pull-secret=/etc/ci-pull-credentials/.dockerconfigjson
+  )
+
+  # Older hypershift branches don't bundle the DNSEndpoint CRD (openshift/hypershift#9433).
+  # Detect via the operator's own render output instead of branching on version,
+  # so behavior always tracks what install would actually do.
+  # Captured separately from the grep so a failed render (as opposed to a
+  # successful render simply missing the CRD) surfaces as a hard failure
+  # instead of silently falling through to the manual-apply branch.
+  RENDERED_CRDS="$("${HCP_CLI}" install render --outputs=crds "${CMD_ARGS[@]}")"
+  if ! echo "${RENDERED_CRDS}" | grep -q 'name: dnsendpoints.externaldns.k8s.io'; then
+    echo "DNSEndpoint CRD not bundled by this hypershift version, installing manually..."
+    # Pinned to the commit tagged v0.15.0 (immutable, unlike the mutable tag ref).
+    oc apply -f https://raw.githubusercontent.com/kubernetes-sigs/external-dns/bf70e3f0acbfbf2fce0bc71a4ca2fd6850de4903/docs/contributing/crd-source/crd-manifest.yaml
+  fi
+
   # Install HyperShift operator
   # The --pull-secret flag creates the pull-secret in the hypershift namespace
-  "${HCP_CLI}" install --hypershift-image="${OPERATOR_IMAGE}" \
-  --external-dns-provider=google \
-  --external-dns-domain-filter="${HYPERSHIFT_CI_DNS_DOMAIN}" \
-  --external-dns-google-project="${HYPERSHIFT_CI_PROJECT}" \
-  --private-platform=GCP \
-  --gcp-project="${GCP_PROJECT_ID}" \
-  --gcp-region="${GCP_REGION_VALUE}" \
-  --platform-monitoring=All \
-  --enable-ci-debug-output \
-  --pull-secret=/etc/ci-pull-credentials/.dockerconfigjson \
+  "${HCP_CLI}" install "${CMD_ARGS[@]}" \
   --wait-until-available \
   ${EXTRA_ARGS}     ;;
 
@@ -218,51 +306,13 @@ case "${CLOUD_PROVIDER}" in
     ;;
 esac
 
-# --- HyperShift Operator image verification ---
-# Disable xtrace for the entire verification block so that raw image pullspecs
-# and imageIDs (which may contain internal registry hostnames) are never logged
-# via set -x. Only safe digest-only values reach stdout and public artifacts.
+# --- Post-install operator image verification ---
+# Update the verification state with data from the live deployment. The EXIT
+# trap (registered before the install) writes the JSON artifact on any exit,
+# so these values are captured even if a later command fails.
+# Disable xtrace so raw pullspecs and imageIDs are never logged.
 [[ $- == *x* ]] && _XTRACE_WAS_ON=true || _XTRACE_WAS_ON=false
 set +x
-
-# Helper: extract a sha256 digest from an image reference or runtime imageID.
-# Handles two common formats:
-#   - pullspec with digest: "registry/repo@sha256:abc…"
-#   - CRI-O / runtime imageID: "docker://sha256:abc…"
-# Returns "sha256:…", "tag-only", or "unavailable" — never a raw pullspec.
-_safe_digest() {
-  local ref="$1"
-  if [[ "${ref}" == *@sha256:* ]]; then
-    # docker-pullable://registry/repo@sha256:… or registry/repo@sha256:…
-    echo "${ref##*@}"
-  elif [[ "${ref}" == docker://sha256:* ]]; then
-    # CRI-O runtime imageID: docker://sha256:…
-    echo "${ref#docker://}"
-  elif [[ "${ref}" == "unavailable" ]]; then
-    echo "unavailable"
-  else
-    echo "tag-only"
-  fi
-}
-
-# Helper: extract a sha256 digest from a raw image reference for comparison.
-# Like _safe_digest but also handles the docker:// prefix for digest extraction.
-_extract_digest() {
-  local ref="$1"
-  if [[ "${ref}" == *@sha256:* ]]; then
-    echo "${ref##*@}"
-  elif [[ "${ref}" == docker://sha256:* ]]; then
-    echo "${ref#docker://}"
-  else
-    echo "${ref}"
-  fi
-}
-
-# Persist the resolved operator image for downstream steps (inter-step only;
-# SHARED_DIR is not uploaded as a public Prow artifact).
-echo "${OPERATOR_IMAGE}" > "${SHARED_DIR}/hypershift-operator-image"
-# Write only the safe digest to the public artifact directory.
-_safe_digest "${OPERATOR_IMAGE}" > "${ARTIFACT_DIR}/hypershift-operator-image.txt"
 
 # Query the actual deployed operator from the management cluster.
 # Prefer the explicit management_cluster_kubeconfig written by the nested-management-cluster
@@ -295,37 +345,16 @@ if [[ -n "${VERIFY_KUBECONFIG}" ]] && [[ -f "${VERIFY_KUBECONFIG}" ]]; then
   [[ -z "${POD_IMAGE_ID}" ]] && POD_IMAGE_ID="unavailable"
 fi
 
-# Write a structured verification artifact with safe digest-only data.
-# Raw pullspecs are kept in memory for comparison but never written to logs or artifacts.
-OVERRIDE_SUPPLIED="false"
-if [[ -n "${OVERRIDE_HYPERSHIFT_OPERATOR_IMAGE:-}" ]]; then
-  OVERRIDE_SUPPLIED="true"
-fi
-
-INTENDED_SAFE=$(_safe_digest "${OPERATOR_IMAGE}")
-DEPLOYED_SAFE=$(_safe_digest "${DEPLOYED_IMAGE}")
-POD_SAFE=$(_safe_digest "${POD_IMAGE_ID}")
-
-cat > "${ARTIFACT_DIR}/hypershift-operator-image-verification.json" <<VERIFY_EOF
-{
-  "intended_digest": "${INTENDED_SAFE}",
-  "deployed_digest": "${DEPLOYED_SAFE}",
-  "pod_digest": "${POD_SAFE}",
-  "override_supplied": ${OVERRIDE_SUPPLIED}
-}
-VERIFY_EOF
-
-echo "INFO: HyperShift Operator image verification artifact written"
-echo "  Intended: ${INTENDED_SAFE}"
-echo "  Deployed: ${DEPLOYED_SAFE}"
-echo "  Pod: ${POD_SAFE}"
+# Update the verification state for the EXIT trap.
+_VERIFY_DEPLOYED=$(_safe_digest "${DEPLOYED_IMAGE}")
+_VERIFY_POD=$(_safe_digest "${POD_IMAGE_ID}")
 
 # When an explicit override was supplied, verify the deployment converged to the
 # intended image by comparing immutable sha256 digests. A mismatch means the
 # operator rollout did not pick up the override — fail the step so the CI signal
 # is clear. This only fires on the opt-in override path; ordinary e2e jobs that
 # use the default pipeline image are unaffected.
-if [[ "${OVERRIDE_SUPPLIED}" == "true" ]] && [[ "${POD_IMAGE_ID}" != "unavailable" ]]; then
+if [[ "${_VERIFY_OVERRIDE}" == "true" ]] && [[ "${POD_IMAGE_ID}" != "unavailable" ]]; then
   # Extract sha256 digest from the pod's imageID.
   # Handles both "docker-pullable://…@sha256:abc" and "docker://sha256:abc".
   DEPLOYED_DIGEST=$(_extract_digest "${POD_IMAGE_ID}")
@@ -338,7 +367,7 @@ if [[ "${OVERRIDE_SUPPLIED}" == "true" ]] && [[ "${POD_IMAGE_ID}" != "unavailabl
       echo "  Intended digest: ${INTENDED_DIGEST}"
       echo "  Deployed digest: ${DEPLOYED_DIGEST}"
       # Restore xtrace before exiting so post-step cleanup is visible.
-      ${_XTRACE_WAS_ON} && set -x
+      ${_XTRACE_WAS_ON} && set -x || true
       exit 1
     else
       echo "INFO: HyperShift Operator image digest verified"
@@ -348,4 +377,4 @@ if [[ "${OVERRIDE_SUPPLIED}" == "true" ]] && [[ "${POD_IMAGE_ID}" != "unavailabl
 fi
 
 # Restore xtrace to its previous state.
-${_XTRACE_WAS_ON} && set -x
+${_XTRACE_WAS_ON} && set -x || true
