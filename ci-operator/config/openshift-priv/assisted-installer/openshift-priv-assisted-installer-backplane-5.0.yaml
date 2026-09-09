@@ -1,16 +1,12 @@
 base_images:
-  assisted-installer:
+  assisted-image-service:
     name: ocm-5.0
     namespace: edge-infrastructure
-    tag: assisted-installer
+    tag: assisted-image-service
   assisted-installer-agent:
     name: ocm-5.0
     namespace: edge-infrastructure
     tag: assisted-installer-agent
-  assisted-installer-controller:
-    name: ocm-5.0
-    namespace: edge-infrastructure
-    tag: assisted-installer-controller
   assisted-service:
     name: ocm-5.0
     namespace: edge-infrastructure
@@ -29,13 +25,15 @@ base_images:
     tag: dev-scripts
 build_root:
   from_repository: true
-canonical_go_repository: github.com/openshift/assisted-image-service
+canonical_go_repository: github.com/openshift/assisted-installer
 images:
   items:
-  - dockerfile_path: Dockerfile.image-service
-    to: assisted-image-service
-  - dockerfile_path: Dockerfile.image-service-build
-    to: assisted-image-service-build
+  - dockerfile_path: Dockerfile.assisted-installer
+    to: assisted-installer
+  - dockerfile_path: Dockerfile.assisted-installer-controller
+    to: assisted-installer-controller
+  - dockerfile_path: Dockerfile.assisted-installer-build
+    to: assisted-installer-build
 promotion:
   to:
   - disabled: true
@@ -49,12 +47,6 @@ releases:
       product: ocp
       stream: nightly
       version: "5.0"
-  latest-multi:
-    candidate:
-      architecture: multi
-      product: ocp
-      stream: nightly
-      version: "5.0"
 resources:
   '*':
     requests:
@@ -63,32 +55,39 @@ resources:
 tests:
 - as: lint
   commands: |
-    export GOCACHE=/tmp/
+    export GOCACHE=/tmp/gocache
+    export GOMODCACHE=/tmp/gomodcache
     export GOLANGCI_LINT_CACHE=/tmp/.cache
     export GOPROXY=https://proxy.golang.org
     make lint
   container:
     clone: true
-    from: assisted-image-service-build
-  skip_if_only_changed: \.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|LICENSE)$
-- as: test
-  commands: |
-    export GOCACHE=/tmp/gocache
-    export GOMODCACHE=/tmp/gomodcache
-    export CODECOV_TOKEN=$(cat /tmp/secret/codecov-token)
-    make test
+    from: assisted-installer-build
+  skip_if_only_changed: ^docs/|^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|PROJECT|LICENSE)$
+- as: format-check
+  commands: make format-check
   container:
     clone: true
-    from: assisted-image-service-build
+    from: assisted-installer-build
+  skip_if_only_changed: ^docs/|^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|PROJECT|LICENSE)$
+- as: unit-test
+  commands: |
+    export GOCACHE=/tmp/gocache
+    export CODECOV_TOKEN=$(cat /tmp/secret/codecov-token)
+    make REPORTS=${ARTIFACT_DIR} unit-test
+  container:
+    clone: true
+    from: assisted-installer-build
   secret:
     mount_path: /tmp/secret
-    name: assisted-image-service-codecov-token
-  skip_if_only_changed: \.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|LICENSE)$
-- as: e2e-ai-operator-ztp
+    name: assisted-installer-codecov-token
+  skip_if_only_changed: ^docs/|^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|PROJECT|LICENSE)$
+- always_run: false
+  as: e2e-ai-operator-ztp
   capabilities:
   - intranet
   optional: true
-  skip_if_only_changed: \.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|LICENSE)$
+  pipeline_skip_if_only_changed: ^docs/|^\.github/|\.md$|^(?:.*/)?(?:\.gitignore|.tekton/.*|OWNERS|OWNERS_ALIASES|PROJECT|LICENSE)$
   steps:
     cluster_profile: packet-assisted
     dependencies:
@@ -99,6 +98,6 @@ tests:
       CLUSTERTYPE: assisted_medium_el9
     workflow: assisted-ofcir-baremetal-operator-ztp
 zz_generated_metadata:
-  branch: release-ocm-5.0
+  branch: backplane-5.0
   org: openshift-priv
-  repo: assisted-image-service
+  repo: assisted-installer
