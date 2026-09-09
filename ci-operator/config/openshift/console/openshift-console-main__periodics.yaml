@@ -1,0 +1,101 @@
+# Console QE owns the weekly reliability audit. Secret values are provisioned
+# outside this repository; see test-prow-e2e-audit/README.md in openshift/console.
+base_images:
+  ocp_builder_rhel-9-base-nodejs-openshift-4.22:
+    name: builder
+    namespace: ocp
+    tag: rhel-9-base-nodejs-openshift-4.22
+build_root:
+  from_repository: true
+images:
+  items:
+  - dockerfile_path: Dockerfile
+    to: console
+  - dockerfile_path: Dockerfile.plugins.demo
+    from: ocp_builder_rhel-9-base-nodejs-openshift-4.22
+    to: console-plugin-demo
+  - dockerfile_literal: |
+      FROM ocp_builder_rhel-9-base-nodejs-openshift-4.22
+      USER root
+      RUN dnf install -y \
+          alsa-lib atk at-spi2-atk cups-libs libdrm libXcomposite \
+          libXdamage libXrandr mesa-libgbm pango nss nss-util nspr \
+          libxkbcommon libXfixes libXcursor libXext libXi libXtst \
+          libwayland-client && \
+          dnf clean all
+      COPY . /go/src/github.com/openshift/console/
+      WORKDIR /go/src/github.com/openshift/console
+      ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright \
+          CYPRESS_INSTALL_BINARY=0
+      RUN YARN_PATH="frontend/$(awk '/yarnPath:/{print $2}' frontend/.yarnrc.yml)" && \
+          printf '%s\n' '#!/bin/sh' "exec node /go/src/github.com/openshift/console/$YARN_PATH \"\$@\"" > /usr/local/bin/yarn && \
+          chmod +x /usr/local/bin/yarn
+      RUN cd frontend && \
+          yarn install --immutable && \
+          yarn playwright install chromium
+    from: ocp_builder_rhel-9-base-nodejs-openshift-4.22
+    inputs:
+      src:
+        paths:
+        - destination_dir: .
+          source_path: /go/src/github.com/openshift/console/.
+    to: console-playwright-runner
+releases:
+  initial:
+    integration:
+      name: "5.1"
+      namespace: ocp
+  latest:
+    integration:
+      include_built_images: true
+      name: "5.1"
+      namespace: ocp
+resources:
+  '*':
+    requests:
+      cpu: 100m
+      memory: 200Mi
+  console:
+    requests:
+      cpu: "2"
+      memory: 10Gi
+  console-playwright-runner:
+    requests:
+      cpu: "1"
+      memory: 12Gi
+tests:
+- as: e2e-gcp-console-audit
+  # ci-operator cron is UTC-only. The Console entrypoint runs only the 09:00
+  # America/New_York occurrence, so one of these two DST-offset triggers is a no-op.
+  cron: 0 13,14 * * 2
+  max_concurrency: 1
+  steps:
+    cluster_profile: openshift-org-gcp
+    test:
+    - as: test
+      cli: latest
+      commands: |
+        export AUDIT_ENFORCE_EASTERN_SCHEDULE="true"
+        export AUDIT_HISTORY_DIR=/var/run/console-qe-e2e-audit/history
+        export AUDIT_BUGS_FILE=/var/run/console-qe-e2e-audit/bugs.json
+        export AUDIT_SLACK_WEBHOOK_FILE=/var/run/console-qe-e2e-audit/slack-webhook
+        ./test-prow-e2e-audit/run.sh
+      credentials:
+      - mount_path: /var/run/console-qe-e2e-audit
+        name: console-qe-e2e-audit
+        namespace: test-credentials
+      dependencies:
+      - env: PLUGIN_PULL_SPEC
+        name: console-plugin-demo
+      from: console-playwright-runner
+      resources:
+        requests:
+          cpu: "4"
+          memory: 10Gi
+      timeout: 2h0m0s
+    workflow: ipi-gcp
+zz_generated_metadata:
+  branch: main
+  org: openshift
+  repo: console
+  variant: periodics
